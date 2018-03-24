@@ -49,12 +49,49 @@
   <script src="./dist/swagger-editor-standalone-preset.js"> </script>
   <script>
   window.onload = function() {
+
+  function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+  }
+  const SpecUpdateListenerPlugin = function() {
+    return {
+      statePlugins: {
+        spec: {
+          wrapActions: {
+            updateSpec: function(oriAction) {
+              return function(spec) {
+                var url = getParameterByName('url');
+                var xhr = new XMLHttpRequest();
+                xhr.open('PUT', url, true);
+                xhr.send(spec);
+
+                if (xhr.status != 200) {
+                  console.log( xhr.status + ': ' + xhr.statusText );
+                }
+                return oriAction(spec);
+              };
+            }
+          }
+        }
+      }
+    }
+  }
+
     // Build a system
     const editor = SwaggerEditorBundle({
       dom_id: '#swagger-editor',
       layout: 'StandaloneLayout',
       presets: [
         SwaggerEditorStandalonePreset
+      ],
+      plugins: [
+        SpecUpdateListenerPlugin
       ]
     })
 

@@ -67,12 +67,15 @@
             updateSpec: function(oriAction) {
               return function(spec) {
                 var url = getParameterByName('url');
-                var xhr = new XMLHttpRequest();
-                xhr.open('PUT', url, true);
-                xhr.send(spec);
+                var w = getParameterByName('w');
+                if (w) {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('PUT', url, true);
+                    xhr.send(spec);
 
-                if (xhr.status != 200) {
-                  console.log( xhr.status + ': ' + xhr.statusText );
+                    if (xhr.status != 200) {
+                      console.log( xhr.status + ': ' + xhr.statusText );
+                    }
                 }
                 return oriAction(spec);
               };
